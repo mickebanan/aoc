@@ -30,9 +30,7 @@ def get(y, x):
 
 while unvisited:
     q = [next(iter(unvisited))]
-    area = 0
-    perimeter = 0
-    corners = 0
+    area = perimeter = corners = 0
     while q:
         y, x = q.pop(0)
         area += 1
