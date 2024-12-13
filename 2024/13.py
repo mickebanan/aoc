@@ -30,10 +30,10 @@ def solve(x, y, p):
     # Solve using Cramer's rule.
     (a1, b1), (a2, b2), (c1, c2) = x, y, p
     det = a1*b2 - b1*a2
-    dx = (c1*b2 - b1*c2) / det
-    dy = (a1*c2 - c1*a2) / det
-    if dx == round(dx) and dy == round(dy):
-        return 3*dx + dy
+    x = (c1*b2 - b1*c2) / det
+    y = (a1*c2 - c1*a2) / det
+    if x == round(x) and y == round(y):
+        return 3*x + y
     return 0
 
 p1 = p2 = 0
