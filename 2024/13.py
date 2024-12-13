@@ -1,7 +1,5 @@
 import re
 
-import numpy as np
-
 data = """
 Button A: X+94, Y+34
 Button B: X+22, Y+67
@@ -26,20 +24,27 @@ for m in data:
     ax, ay = re.match(r'Button A: X.(\d+), Y.(\d+)', a).groups()
     bx, by = re.match(r'Button B: X.(\d+), Y.(\d+)', b).groups()
     px, py = re.match(r'Prize: X=(\d+), Y=(\d+)', prize).groups()
-    machines.append((np.array([[int(ax), int(bx)], [int(ay), int(by)]]),
-                     np.array([int(px), int(py)])))
+    machines.append(((int(ax), int(bx)), (int(ay), int(by)), (int(px), int(py))))
 
-def solve(a, b):
-    s = np.linalg.solve(a, b)
-    # Kludgy way to only pick the integer solutions. It happens to work in this case.
-    if np.all(np.abs(s - np.round(s)) < np.array([0.01, 0.01])):
-        return 3*s[0] + s[1]
+def solve(x, y, p):
+    # Solve using Cramer's rule.
+    a1, b1 = x
+    a2, b2 = y
+    c1, c2 = p
+    det = a1*b2 - b1*a2
+    det_x = c1*b2 - b1*c2
+    det_y = a1*c2 - c1*a2
+    dx = det_x / det
+    dy = det_y / det
+    if dx == round(dx) and dy == round(dy):
+        return 3*dx + dy
     return 0
 
 p1 = p2 = 0
-for a, b in machines:
-    p1 += solve(a, b)
-    b += np.array([10000000000000, 10000000000000])
-    p2 += solve(a, b)
+for m in machines:
+    p1 += solve(*m)
+    x, y, p = m
+    p = (p[0] + 10000000000000, p[1] + 10000000000000)
+    p2 += solve(x, y, p)
 print('part 1:', int(p1))
 print('part 2:', int(p2))
