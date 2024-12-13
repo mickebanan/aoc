@@ -28,14 +28,10 @@ for m in data:
 
 def solve(x, y, p):
     # Solve using Cramer's rule.
-    a1, b1 = x
-    a2, b2 = y
-    c1, c2 = p
+    (a1, b1), (a2, b2), (c1, c2) = x, y, p
     det = a1*b2 - b1*a2
-    det_x = c1*b2 - b1*c2
-    det_y = a1*c2 - c1*a2
-    dx = det_x / det
-    dy = det_y / det
+    dx = (c1*b2 - b1*c2) / det
+    dy = (a1*c2 - c1*a2) / det
     if dx == round(dx) and dy == round(dy):
         return 3*dx + dy
     return 0
