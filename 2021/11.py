@@ -38,6 +38,7 @@ for row in data:
 data = _data
 ymax = len(data) - 1
 xmax = len(data[0]) - 1
+dirs = ((1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1))
 
 
 def viz():
@@ -46,22 +47,9 @@ def viz():
 
 
 def get_neighbors(y, x):
-    if x:
-        yield y, x - 1
-    if x < xmax:
-        yield y, x + 1
-    if y:
-        yield y - 1, x
-    if y < ymax:
-        yield y + 1, x
-    if x and y:
-        yield y - 1, x - 1
-    if x < xmax and y:
-        yield y - 1, x + 1
-    if x and y < ymax:
-        yield y + 1, x - 1
-    if x < xmax and y < ymax:
-        yield y + 1, x + 1
+    for dy, dx in dirs:
+        if 0 <= y + dy <= ymax and 0 <= x + dx <= xmax:
+            yield y + dy, x + dx
 
 
 def increment(y, x, data):
