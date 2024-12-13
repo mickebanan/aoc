@@ -37,9 +37,8 @@ def solve(x, y, p):
     return 0
 
 p1 = p2 = 0
-for m in machines:
-    p1 += solve(*m)
-    x, y, p = m
+for x, y, p in machines:
+    p1 += solve(x, y, p)
     p = (p[0] + 10000000000000, p[1] + 10000000000000)
     p2 += solve(x, y, p)
 print('part 1:', int(p1))
