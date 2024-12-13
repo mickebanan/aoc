@@ -23,23 +23,23 @@ for m in data:
     a, b, prize = [m for m in m.split('\n') if m]
     ax, ay = re.match(r'Button A: X.(\d+), Y.(\d+)', a).groups()
     bx, by = re.match(r'Button B: X.(\d+), Y.(\d+)', b).groups()
-    px, py = re.match(r'Prize: X=(\d+), Y=(\d+)', prize).groups()
-    machines.append(((int(ax), int(bx)), (int(ay), int(by)), (int(px), int(py))))
+    cx, cy = re.match(r'Prize: X=(\d+), Y=(\d+)', prize).groups()
+    machines.append(((int(ax), int(ay)), (int(bx), int(by)), (int(cx), int(cy))))
 
 def solve(x, y, p):
     # Solve using Cramer's rule.
-    (a1, b1), (a2, b2), (c1, c2) = x, y, p
-    det = a1*b2 - b1*a2
-    x = (c1*b2 - b1*c2) / det
-    y = (a1*c2 - c1*a2) / det
+    (ax, ay), (bx, by), (cx, cy) = x, y, p
+    det = ax*by - bx*ay
+    x = (cx*by - bx*cy) / det
+    y = (ax*cy - cx*ay) / det
     if x == round(x) and y == round(y):
         return 3*x + y
     return 0
 
 p1 = p2 = 0
-for x, y, p in machines:
-    p1 += solve(x, y, p)
-    p = (p[0] + 10000000000000, p[1] + 10000000000000)
-    p2 += solve(x, y, p)
+for a, b, c in machines:
+    p1 += solve(a, b, c)
+    c = (c[0] + 10000000000000, c[1] + 10000000000000)
+    p2 += solve(a, b, c)
 print('part 1:', int(p1))
 print('part 2:', int(p2))
