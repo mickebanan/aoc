@@ -87,7 +87,7 @@ class OutputInstruction(Instruction):
         elif parameters[-1] == '1':
             pv = machine.program[machine.pc + 1]
         else:
-            pv = machine.program[machine.pc + 1 + machine.relative_base]
+            pv = machine.program[machine.program[machine.pc + 1] + machine.relative_base]
         machine.log(' Output, value: %s, from position %s'
                     % (pv, machine.program[machine.pc + 1] if parameters[-1] == '0' else machine.pc + 1))
         machine.pc += cls.length
