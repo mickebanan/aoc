@@ -1,5 +1,6 @@
 import collections
 import copy
+from functools import reduce
 
 data = """
 p=0,4 v=3,-3
@@ -40,23 +41,18 @@ def move(tiles, steps=1):
     return d
 
 def get_safety_score(tiles):
-    q1 = q2 = q3 = q4 = 0
-    for y in range(ymax):
-        if y == ymax // 2:
-            continue
-        for x in range(xmax):
-            if x == xmax // 2:
-                continue
-            if (y, x) in tiles:
-                if y < ymax // 2 and x < xmax // 2:
-                    q1 += len(tiles[(y, x)])
-                if y > ymax // 2 and x < xmax // 2:
-                    q2 += len(tiles[(y, x)])
-                if y < ymax // 2 and x > xmax // 2:
-                    q3 += len(tiles[(y, x)])
-                if y > ymax // 2 and x > xmax // 2:
-                    q4 += len(tiles[(y, x)])
-    return q1 * q2 * q3 * q4
+    values = {'1': 0, '2': 0, '3': 0, '4': 0}
+    quadrants = (
+        (range(ymax // 2), range(xmax // 2)),
+        (range(ymax // 2), range(xmax // 2 + 1, xmax)),
+        (range(ymax // 2 + 1, ymax), range(xmax // 2)),
+        (range(ymax // 2 + 1, ymax), range(xmax // 2 + 1, xmax)),
+    )
+    for (y, x), robots in tiles.items():
+        for q, (yrange, xrange) in zip('1234', quadrants):
+            if yrange.start <= y < yrange.stop and xrange.start <= x < xrange.stop:
+                values[q] += len(robots)
+    return reduce(lambda x, y: x * y, values.values())
 
 tiles_p1 = move(tiles, steps=100)
 score = get_safety_score(tiles_p1)
