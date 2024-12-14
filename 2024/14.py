@@ -52,6 +52,7 @@ def get_safety_score(tiles):
         for q, (yrange, xrange) in zip('1234', quadrants):
             if yrange.start <= y < yrange.stop and xrange.start <= x < xrange.stop:
                 values[q] += len(robots)
+                break
     return reduce(lambda x, y: x * y, values.values())
 
 tiles_p1 = move(tiles, steps=100)
