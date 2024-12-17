@@ -17,12 +17,10 @@ def run(data, a):
     s = []
     registers = {4: a, 5: 0, 6: 0}
     while ip < len(data):
-        opcode = data[ip]
-        operand = data[ip + 1]
+        opcode, operand = data[ip:ip + 2]
         if opcode in (0, 6, 7):  # adv, bdv, cdv
             num = registers[4]
-            den = 2 ** get_combo_value(operand)
-            value = num // den
+            value = num // 2**get_combo_value(operand)
             if opcode == 0:
                 registers[4] = value
             elif opcode == 6:
@@ -33,10 +31,9 @@ def run(data, a):
             registers[5] ^= operand if opcode == 1 else registers[6]
         elif opcode == 2:  # bst
             registers[5] = get_combo_value(operand) % 8
-        elif opcode == 3:  # jnz
-            if registers[4] != 0:
-                ip = operand
-                continue
+        elif opcode == 3 and registers[4] != 0:  # jnz
+            ip = operand
+            continue
         elif opcode == 5:  # out
             s.append(get_combo_value(operand) % 8)
         ip += 2
