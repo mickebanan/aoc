@@ -66,4 +66,4 @@ def run(levels):
     return sum(get_length(seq, levels) * int(seq.replace('A', '')) for seq in data)
 
 print('part 1:', run(2))
-print('part 1:', run(25))
+print('part 2:', run(25))
