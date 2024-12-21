@@ -8,7 +8,7 @@ data = """
 456A
 379A
 """.strip().splitlines()
-data = open('data/21.dat').read().strip().splitlines()
+# data = open('data/21.dat').read().strip().splitlines()
 
 class Keypad:
     pos = None
@@ -26,18 +26,18 @@ class Keypad:
         pos = next((y, x) for y, row in enumerate(self.layout) for x, c in enumerate(row) if c == self.pos)
         visited = {self.forbidden}
         q = [(pos, '', visited)]
-        shortest = 1_000_000
+        dist = abs(pos[0] - to[0]) + abs(pos[1] - to[1])
         while q:
             (y, x), sequence, visited = q.pop(0)
-            if (y, x) in visited:
+            if (y, x) in visited or (y, x) == self.pos or len(sequence) > dist:
                 continue
-            if (y, x) == to and len(sequence) <= shortest:
+            if (y, x) == to:
                 yield sequence
-                shortest = min(shortest, len(sequence))
-            visited.add((y, x))
+            if sequence:
+                visited.add((y, x, sequence[-1]))
             for d, (dy, dx) in self.dirs.items():
                 if 0 <= y + dy <= self.ymax and 0 <= x + dx <= self.xmax:
-                    q.append(((y + dy, x + dx), sequence + d, visited.copy()))
+                    q.append(((y + dy, x + dx), sequence + d, visited))
 
     def move(self, to):
         # print('move from {} to {}'.format(self.pos, to))
@@ -49,6 +49,7 @@ class Keypad:
 
     def get_all_sequences(self, input):
         sequences = []
+        # print('getting sequences for', input)
         for i, c in enumerate(input):
             # print('doing input', c)
             moves = []
@@ -67,31 +68,17 @@ class Keypad:
         return sequences
 
 
-
 class Robot(Keypad):
     layout = ['X^A', '<v>']
 
-k = Keypad()
-r1 = Robot()
-r2 = Robot()
+p1_keypads = [Keypad(), Robot(), Robot()]
 
 p1 = 0
 for seq in data:
-    first = []
-    ss = k.get_all_sequences(seq)
-    # print(ss)
-    results = []
-    for second_seq in ss:
-        ss2 = r1.get_all_sequences(second_seq)
-        # print(ss2)
-        for third_seq in ss2:
-            ss3 = r2.get_all_sequences(third_seq)
-            ss3 = sorted(ss3)
-            # for res in ss3:
-            #     print(len(res), res)
-            # print(ss3[0])
-            results.extend(ss3)
+    results = [seq]
+    for kp in p1_keypads:
+        results = list(itertools.chain.from_iterable(kp.get_all_sequences(r) for r in results))
     results.sort(key=len)
-    print(seq, len(sorted(results, key=lambda v: len(v))[0]))
+    print(seq, len(results[0]))
     p1 += len(results[0]) * int(seq.replace('A', ''))
 print(p1)
