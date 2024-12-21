@@ -1,5 +1,4 @@
-import itertools
-import pprint
+import functools
 
 data = """
 029A
@@ -8,77 +7,63 @@ data = """
 456A
 379A
 """.strip().splitlines()
-# data = open('data/21.dat').read().strip().splitlines()
+data = open('data/21.dat').read().strip().splitlines()
+dirs = {'>': (0, 1), '<': (0, -1), '^': (-1, 0), 'v': (1, 0)}
+
 
 class Keypad:
-    pos = None
     layout = ['789', '456', '123', 'X0A']
-    dirs = {'^': (-1, 0), 'v': (1, 0), '>': (0, 1), '<': (0, -1)}
-    forbidden = None
-
-    def __init__(self):
-        self.pos = 'A'
-        self.ymax = len(self.layout) - 1
-        self.xmax = len(self.layout[0]) - 1
-        self.forbidden = next((y, x) for y, row in enumerate(self.layout) for x, c in enumerate(row) if c == 'X')
-
-    def get_moves(self, to):
-        pos = next((y, x) for y, row in enumerate(self.layout) for x, c in enumerate(row) if c == self.pos)
-        visited = {self.forbidden}
-        q = [(pos, '', visited)]
-        dist = abs(pos[0] - to[0]) + abs(pos[1] - to[1])
-        while q:
-            (y, x), sequence, visited = q.pop(0)
-            if (y, x) in visited or (y, x) == self.pos or len(sequence) > dist:
-                continue
-            if (y, x) == to:
-                yield sequence
-            if sequence:
-                visited.add((y, x, sequence[-1]))
-            for d, (dy, dx) in self.dirs.items():
-                if 0 <= y + dy <= self.ymax and 0 <= x + dx <= self.xmax:
-                    q.append(((y + dy, x + dx), sequence + d, visited))
-
-    def move(self, to):
-        # print('move from {} to {}'.format(self.pos, to))
-        ny, nx = next((y, x) for y, row in enumerate(self.layout) for x, c in enumerate(row) if c == to)
-        # print('(%s, %s), (%s, %s)' % (y, x, ny, nx))
-        for path in self.get_moves((ny, nx)):
-            yield path + 'A'
-        self.pos = self.layout[ny][nx]
-
-    def get_all_sequences(self, input):
-        sequences = []
-        # print('getting sequences for', input)
-        for i, c in enumerate(input):
-            # print('doing input', c)
-            moves = []
-            for m in self.move(c):
-                # print(m)
-                moves.append(m)
-            if i == 0:
-                sequences = moves
-            else:
-                s = []
-                for seq in sequences:
-                    for m in moves:
-                        s.append(seq + m)
-                sequences = s
-        # print(len(sequences), sequences[:50])
-        return sequences
+    forbidden = (3, 0)
 
 
-class Robot(Keypad):
+class Robot:
     layout = ['X^A', '<v>']
+    forbidden = (0, 0)
 
-p1_keypads = [Keypad(), Robot(), Robot()]
 
-p1 = 0
-for seq in data:
-    results = [seq]
-    for kp in p1_keypads:
-        results = list(itertools.chain.from_iterable(kp.get_all_sequences(r) for r in results))
-    results.sort(key=len)
-    print(seq, len(results[0]))
-    p1 += len(results[0]) * int(seq.replace('A', ''))
-print(p1)
+def get_moves(start, end):
+    keypad = Keypad if start.isdigit() or end.isdigit() else Robot
+    pos = next((y, x) for y, row in enumerate(keypad.layout) for x, c in enumerate(row) if c == start)
+    ny, nx = next((y, x) for y, row in enumerate(keypad.layout) for x, c in enumerate(row) if c == end)
+    ymax = len(keypad.layout) - 1
+    xmax = len(keypad.layout[0]) - 1
+    visited = {keypad.forbidden}
+    q = [(pos, '')]
+    dist = abs(pos[0] - ny) + abs(pos[1] - nx)
+    res = []
+    while q:
+        (y, x), sequence = q.pop(0)
+        if (y, x) in visited or len(sequence) > dist:
+            continue
+        if (y, x) == (ny, nx):
+            res.append(sequence + 'A')
+        if sequence:
+            visited.add((y, x, sequence[-1]))
+        for d, (dy, dx) in dirs.items():
+            if 0 <= y + dy <= ymax and 0 <= x + dx <= xmax:
+                q.append(((y + dy, x + dx), sequence + d))
+    return res
+
+
+@functools.cache
+def get_length(sequence, level):
+    total = 0
+    for i in range(len(sequence)):
+        curr = 'A' if i == 0 else sequence[i - 1]
+        following = sequence[i]
+        moves = get_moves(curr, following)
+        if level == 0:
+            total += min(len(s) for s in moves)
+            continue
+        lengths = set()
+        for move in moves:
+            lengths.add(get_length(move, level - 1))
+        total += min(lengths)
+    return total
+
+
+def run(levels):
+    return sum(get_length(seq, levels) * int(seq.replace('A', '')) for seq in data)
+
+print('part 1:', run(2))
+print('part 1:', run(25))
