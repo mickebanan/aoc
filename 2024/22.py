@@ -1,6 +1,3 @@
-from functools import reduce
-from operator import floordiv, mul
-
 data = """
 1
 2
@@ -12,7 +9,6 @@ data = open('data/22.dat').read().strip().splitlines()
 cache = {}
 patterns = set()
 p1 = 0
-
 for n in data:
     seed = n
     cache[seed] = {}
@@ -20,8 +16,9 @@ for n in data:
     prev = None
     pattern = ()
     for _ in range(2000):
-        for op, x in ((mul, 64), (floordiv, 32), (mul, 2048)):
-            n ^= reduce(op, (n, x)) % 16777216
+        n ^= (n << 6) & 16777216 - 1
+        n ^= (n >> 5) & 16777216 - 1
+        n ^= (n << 11) & 16777216 - 1
         last = int(str(n)[-1])
         if prev is not None:
             diff = last - prev
