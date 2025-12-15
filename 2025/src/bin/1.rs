@@ -25,7 +25,7 @@ fn main() {
         };
         pos = match new {
             v if v <= 0 => (100 + v) % 100,
-            v if v >= 100 => (new - 100) % 100,
+            v if v >= 100 => (v - 100) % 100,
             v => v,
         };
     }

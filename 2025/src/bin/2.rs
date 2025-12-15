@@ -4,8 +4,7 @@ fn main() {
     let mut p2: u64 = 0;
     for interval in data.split(",") {
         let (start, stop) = interval.split_once("-").unwrap();
-        let start: u64 = start.parse().unwrap();
-        let stop: u64 = stop.parse().unwrap();
+        let (start, stop): (u64, u64) = (start.parse().unwrap(), stop.parse().unwrap());
         for e in start..=stop {
             let es = e.to_string();
             if is_repeated_1(&es) {
