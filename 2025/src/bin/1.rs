@@ -1,5 +1,5 @@
 fn main() {
-    let data = std::fs::read_to_string("./data/1.dat").unwrap();
+    let data = std::fs::read_to_string("data/1.dat").unwrap();
     let mut pos = 50;
     let mut count = 0;
     for item in data.lines() {

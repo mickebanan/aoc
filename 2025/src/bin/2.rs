@@ -1,5 +1,5 @@
 fn main() {
-    let data = std::fs::read_to_string("./data/2.dat").unwrap();
+    let data = std::fs::read_to_string("data/2.dat").unwrap();
     let mut p1: u64 = 0;
     let mut p2: u64 = 0;
     for interval in data.split(",") {
@@ -16,8 +16,8 @@ fn main() {
             }
         }
     }
-    println!("part 1: {}", p1);
-    println!("part 2: {}", p2);
+    println!("part 1: {p1}");
+    println!("part 2: {p2}");
 }
 
 fn is_repeated_1(s: &str) -> bool {
